@@ -2,25 +2,61 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Student Submission</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   </head>
   <body>
-    <h1>Submit Assignment</h1>
-    {% if success %}
-      <p style="color:green">Submission successful. Tracking ID: <strong>{{ tracking_id }}</strong></p>
-    {% endif %}
-    <form action="/submit" method="post" enctype="multipart/form-data">
-      <label>Student Name: <input name="name" required></label><br>
-      <label>ERP Number: <input name="erp" required></label><br>
-      <label>Branch: <input name="branch" required></label><br>
-      <label>Section: <input name="section" required></label><br>
-      <label>Subject: <input name="subject" required></label><br>
-      <label>Description (optional):<br>
-        <textarea name="description" rows="3"></textarea>
-      </label><br>
-      <label>Assignment File: <input type="file" name="file" required></label><br>
-      <button type="submit">Upload</button>
-    </form>
-    <p><a href="/track">Track submission</a> | <a href="/teacher">Teacher dashboard</a></p>
+    <div class="wrap">
+      <div class="card">
+        <h1>Submit Assignment</h1>
+        <p class="lead">Fill required fields and attach your assignment file.</p>
+
+        {% if success %}
+          <div class="success">Submission successful. Tracking ID: <strong>{{ tracking_id }}</strong></div>
+        {% endif %}
+
+        <form action="/submit" method="post" enctype="multipart/form-data">
+          <label>Student Name:
+            <input name="name" required>
+          </label>
+
+          <label>ERP Number:
+            <input name="erp" required>
+          </label>
+
+          <div class="field-row">
+            <div class="col">
+              <label>Branch:
+                <input name="branch" required>
+              </label>
+            </div>
+            <div class="col">
+              <label>Section:
+                <input name="section" required>
+              </label>
+            </div>
+          </div>
+
+          <label>Subject:
+            <input name="subject" required>
+          </label>
+
+          <label>Description (optional):
+            <textarea name="description" rows="3"></textarea>
+          </label>
+
+          <label>Assignment File:
+            <input type="file" name="file" required>
+          </label>
+
+          <div style="margin-top:12px">
+            <button class="btn" type="submit">Upload</button>
+            <a class="links" href="/track">Track submission</a> |
+            <a class="links" href="/teacher">Teacher dashboard</a>
+          </div>
+        </form>
+      </div>
+    </div>
   </body>
 </html>
