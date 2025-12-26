@@ -3,60 +3,158 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Student Submission</title>
+    <title>Student Submission - Assignment Management</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   </head>
   <body>
-    <div class="wrap">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">
+          <i class="fas fa-graduation-cap"></i> Assignment Manager
+        </a>
+        <ul class="nav-links">
+          <li><a href="/student"><i class="fas fa-upload"></i> Submit Assignment</a></li>
+          <li><a href="/track"><i class="fas fa-search"></i> Track Status</a></li>
+          <li><a href="/teacher"><i class="fas fa-chalkboard-teacher"></i> Teacher Dashboard</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container">
       <div class="card">
-        <h1>Submits Assignment</h1>
-        <p class="lead">Fill required fields and attach your assignment file.</p>
+        <div class="card-header">
+          <h1 class="card-title">
+            <i class="fas fa-upload"></i> Submit Assignment
+          </h1>
+          <p class="card-subtitle">Fill in all required fields and upload your assignment file</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>{{ message }}</div>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
 
         {% if success %}
-          <div class="success">Submission successful. Tracking ID: <strong>{{ tracking_id }}</strong></div>
+          <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <div>
+              <strong>Submission Successful!</strong><br>
+              Your assignment has been submitted. Tracking ID: <code>{{ tracking_id }}</code>
+            </div>
+          </div>
         {% endif %}
 
-        <form action="/submit" method="post" enctype="multipart/form-data">
-          <label>Student Name:
-            <input name="name" required>
-          </label>
-
-          <label>ERP Number:
-            <input name="erp" required>
-          </label>
-
-          <div class="field-row">
-            <div class="col">
-              <label>Branch:
-                <input name="branch" required>
+        <form action="/submit" method="post" enctype="multipart/form-data" id="assignmentForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="name">
+                <i class="fas fa-user"></i> Student Name
               </label>
+              <input type="text" id="name" name="name" class="form-input" required placeholder="Enter your full name">
             </div>
-            <div class="col">
-              <label>Section:
-                <input name="section" required>
+
+            <div class="form-group">
+              <label class="form-label" for="erp">
+                <i class="fas fa-id-card"></i> ERP Number
               </label>
+              <input type="text" id="erp" name="erp" class="form-input" required placeholder="Enter your ERP number">
             </div>
           </div>
 
-          <label>Subject:
-            <input name="subject" required>
-          </label>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="branch">
+                <i class="fas fa-building"></i> Branch
+              </label>
+              <input type="text" id="branch" name="branch" class="form-input" required placeholder="e.g., Computer Science">
+            </div>
 
-          <label>Description (optional):
-            <textarea name="description" rows="3"></textarea>
-          </label>
+            <div class="form-group">
+              <label class="form-label" for="section">
+                <i class="fas fa-users"></i> Section
+              </label>
+              <input type="text" id="section" name="section" class="form-input" required placeholder="e.g., A, B, C">
+            </div>
+          </div>
 
-          <label>Assignment File:
-            <input type="file" name="file" required>
-          </label>
+          <div class="form-group">
+            <label class="form-label" for="subject">
+              <i class="fas fa-book"></i> Subject
+            </label>
+            <input type="text" id="subject" name="subject" class="form-input" required placeholder="Enter subject name">
+          </div>
 
-          <div style="margin-top:12px">
-            <button class="btn" type="submit">Upload</button>
-            <a class="links" href="/track">Track submission</a> |
-            <a class="links" href="/teacher">Teacher dashboard</a>
+          <div class="form-group">
+            <label class="form-label" for="description">
+              <i class="fas fa-align-left"></i> Description (Optional)
+            </label>
+            <textarea id="description" name="description" class="form-input" placeholder="Brief description of your assignment..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-file-upload"></i> Assignment File
+            </label>
+            <div class="file-upload">
+              <input type="file" name="file" id="fileInput" required accept=".pdf,.doc,.docx,.txt,.zip,.rar">
+              <label for="fileInput" class="file-upload-label">
+                <div class="file-upload-icon">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div>
+                  <strong>Click to upload</strong> or drag and drop<br>
+                  <small class="text-muted">PDF, DOC, DOCX, TXT, ZIP, RAR files (Max 10MB)</small>
+                </div>
+              </label>
+            </div>
+            <div id="fileInfo" class="mt-2 text-muted"></div>
+          </div>
+
+          <div class="flex gap-4 mt-6">
+            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+              <i class="fas fa-upload"></i>
+              <span>Submit Assignment</span>
+            </button>
+            <a href="/track" class="btn btn-secondary">
+              <i class="fas fa-search"></i> Track Status
+            </a>
           </div>
         </form>
       </div>
     </div>
+
+    <script>
+      // File upload feedback
+      document.getElementById('fileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const fileInfo = document.getElementById('fileInfo');
+        if (file) {
+          fileInfo.innerHTML = `
+            <div class="alert alert-info">
+              <i class="fas fa-file"></i>
+              <div>
+                <strong>Selected:</strong> ${file.name}<br>
+                <strong>Size:</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      // Form submission with loading state
+      document.getElementById('assignmentForm').addEventListener('submit', function(e) {
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.innerHTML = '<div class="loading"></div> <span>Uploading...</span>';
+        submitBtn.disabled = true;
+      });
+    </script>
   </body>
 </html>

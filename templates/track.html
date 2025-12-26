@@ -3,47 +3,232 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Track Submission</title>
+    <title>Track Submission - Assignment Management</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   </head>
   <body>
-    <div class="wrap">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">
+          <i class="fas fa-graduation-cap"></i> Assignment Manager
+        </a>
+        <ul class="nav-links">
+          <li><a href="/student"><i class="fas fa-upload"></i> Submit Assignment</a></li>
+          <li><a href="/track" class="active"><i class="fas fa-search"></i> Track Status</a></li>
+          <li><a href="/teacher"><i class="fas fa-chalkboard-teacher"></i> Teacher Dashboard</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container">
       <div class="card">
-        <h1>Track Submission</h1>
+        <div class="card-header">
+          <h1 class="card-title">
+            <i class="fas fa-search"></i> Track Submission
+          </h1>
+          <p class="card-subtitle">Enter your tracking ID to check assignment status</p>
+        </div>
+
         {% with messages = get_flashed_messages() %}
           {% if messages %}
-            <ul>
-            {% for m in messages %}
-              <li>{{ m }}</li>
+            {% for message in messages %}
+              <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>{{ message }}</div>
+              </div>
             {% endfor %}
-            </ul>
           {% endif %}
         {% endwith %}
 
-        <form method="post">
-          <label>Tracking ID:
-            <input name="tracking_id" required>
-          </label>
-          <div style="margin-top:10px">
-            <button class="btn" type="submit">Lookup</button>
+        <!-- Search Form -->
+        <form method="post" class="track-form">
+          <div class="form-group">
+            <label class="form-label" for="tracking_id">
+              <i class="fas fa-hashtag"></i> Tracking ID
+            </label>
+            <div class="form-row">
+              <input 
+                type="text" 
+                id="tracking_id" 
+                name="tracking_id" 
+                class="form-input" 
+                required 
+                placeholder="Enter your tracking ID (e.g., a1b2c3d4e5)"
+                style="flex: 1;"
+              >
+              <button type="submit" class="btn btn-primary" style="width: auto;">
+                <i class="fas fa-search"></i> Search
+              </button>
+            </div>
+            <small class="text-muted mt-2">
+              <i class="fas fa-info-circle"></i>
+              Your tracking ID was provided when you submitted your assignment
+            </small>
           </div>
         </form>
 
         {% if result %}
-          <h2 style="margin-top:18px">Result</h2>
-          <ul>
-            <li><strong>Tracking ID:</strong> {{ result.id }}</li>
-            <li><strong>Student:</strong> {{ result.student_name }} ({{ result.erp }})</li>
-            <li><strong>Subject:</strong> {{ result.subject }}</li>
-            <li><strong>Submitted At:</strong> {{ result.submitted_at }}</li>
-            <li><strong>File:</strong> <a href="{{ result.file_url }}" target="_blank">Download</a></li>
-            <li><strong>Marks:</strong> {{ result.marks or "-" }}</li>
-            <li><strong>Remark:</strong> {{ result.remark or "-" }}</li>
-          </ul>
-        {% endif %}
+          <!-- Result Card -->
+          <div class="card" style="background:linear-gradient(135deg, var(--success), #059669); color: white; margin-top:2rem;">
+            <div class="card-header" style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+              <h2 class="card-title" style="color: white; margin:0;">
+                <i class="fas fa-check-circle"></i> Assignment Found
+              </h2>
+              <p class="card-subtitle" style="color: rgba(255,255,255,0.9);">
+                Here are the details for tracking ID: <code style="background:rgba(255,255,255,0.2); color:white;">{{ result.id }}</code>
+              </p>
+            </div>
+          </div>
 
-        <p style="margin-top:14px"><a href="/student">Student upload</a> | <a href="/teacher">Teacher dashboard</a></p>
+          <!-- Detailed Information Card -->
+          <div class="card">
+            <div class="form-row">
+              <!-- Student Information -->
+              <div class="card" style="padding:1.5rem;">
+                <h3 style="margin:0 0 1rem; color:var(--text);">
+                  <i class="fas fa-user"></i> Student Information
+                </h3>
+                <div class="form-group" style="margin-bottom:0.5rem;">
+                  <strong>Name:</strong> {{ result.student_name }}
+                </div>
+                <div class="form-group" style="margin-bottom:0.5rem;">
+                  <strong>ERP Number:</strong> {{ result.erp }}
+                </div>
+                <div class="form-group" style="margin-bottom:0.5rem;">
+                  <strong>Branch:</strong> 
+                  <span class="badge badge-info">{{ result.branch }}</span>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <strong>Section:</strong> 
+                  <span class="badge badge-info">{{ result.section }}</span>
+                </div>
+              </div>
+
+              <!-- Assignment Information -->
+              <div class="card" style="padding:1.5rem;">
+                <h3 style="margin:0 0 1rem; color:var(--text);">
+                  <i class="fas fa-book"></i> Assignment Details
+                </h3>
+                <div class="form-group" style="margin-bottom:0.5rem;">
+                  <strong>Subject:</strong> {{ result.subject }}
+                </div>
+                <div class="form-group" style="margin-bottom:0.5rem;">
+                  <strong>Submitted At:</strong><br>
+                  <small class="text-muted">{{ result.submitted_at[:19].replace('T', ' ') }}</small>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <strong>Assignment File:</strong><br>
+                  <a href="{{ result.file_url }}" target="_blank" class="btn btn-sm btn-secondary">
+                    <i class="fas fa-download"></i> Download File
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Grading Status -->
+            <div class="form-row">
+              <div class="card" style="padding:1.5rem;">
+                <h3 style="margin:0 0 1rem; color:var(--text);">
+                  <i class="fas fa-chart-line"></i> Grading Status
+                </h3>
+                {% if result.marks %}
+                  <div class="form-group" style="margin-bottom:0.5rem;">
+                    <strong>Status:</strong> 
+                    <span class="badge badge-success">
+                      <i class="fas fa-check"></i> Graded
+                    </span>
+                  </div>
+                  <div class="form-group" style="margin-bottom:0.5rem;">
+                    <strong>Marks:</strong> 
+                    <span style="font-size:1.5rem; font-weight:bold; color:var(--success);">{{ result.marks }}/100</span>
+                  </div>
+                  {% if result.remark %}
+                  <div class="form-group" style="margin-bottom:0;">
+                    <strong>Teacher's Remark:</strong><br>
+                    <div style="padding:0.75rem; background:var(--border-light); border-radius:var(--radius-sm); margin-top:0.5rem;">
+                      {{ result.remark }}
+                    </div>
+                  </div>
+                  {% endif %}
+                {% else %}
+                  <div class="form-group" style="margin-bottom:0;">
+                    <strong>Status:</strong> 
+                    <span class="badge badge-warning">
+                      <i class="fas fa-clock"></i> Pending Review
+                    </span>
+                    <p class="text-muted" style="margin-top:0.5rem; margin-bottom:0;">
+                      Your assignment is currently being reviewed by the teacher.
+                    </p>
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Timeline -->
+              <div class="card" style="padding:1.5rem;">
+                <h3 style="margin:0 0 1rem; color:var(--text);">
+                  <i class="fas fa-timeline"></i> Timeline
+                </h3>
+                <div style="position:relative;">
+                  <div style="display:flex; align-items:center; margin-bottom:1rem;">
+                    <div style="width:12px; height:12px; background:var(--success); border-radius:50%; margin-right:1rem;"></div>
+                    <div>
+                      <strong>Submitted</strong><br>
+                      <small class="text-muted">{{ result.submitted_at[:19].replace('T', ' ') }}</small>
+                    </div>
+                  </div>
+                  {% if result.marks %}
+                    <div style="display:flex; align-items:center;">
+                      <div style="width:12px; height:12px; background:var(--primary); border-radius:50%; margin-right:1rem;"></div>
+                      <div>
+                        <strong>Graded</strong><br>
+                        <small class="text-muted">Completed</small>
+                      </div>
+                    </div>
+                  {% else %}
+                    <div style="display:flex; align-items:center;">
+                      <div style="width:12px; height:12px; background:var(--warning); border-radius:50%; margin-right:1rem; animation:pulse 2s infinite;"></div>
+                      <div>
+                        <strong>Under Review</strong><br>
+                        <small class="text-muted">Pending</small>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-4 justify-center mt-6">
+            <a href="/student" class="btn btn-secondary">
+              <i class="fas fa-upload"></i> Submit Another Assignment
+            </a>
+            <a href="/teacher" class="btn btn-secondary">
+              <i class="fas fa-chalkboard-teacher"></i> Teacher Dashboard
+            </a>
+          </div>
+        {% endif %}
       </div>
     </div>
+
+    <style>
+      @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+      }
+      
+      .track-form .form-row {
+        gap: 1rem;
+      }
+      
+      @media (max-width: 640px) {
+        .track-form .form-row {
+          flex-direction: column;
+        }
+      }
+    </style>
   </body>
 </html>

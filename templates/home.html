@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Assignment Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="/home" class="nav-brand">
+          <i class="fas fa-graduation-cap"></i> Assignment Manager
+        </a>
+        <ul class="nav-links">
+          <li><a href="/student"><i class="fas fa-upload"></i> Submit Assignment</a></li>
+          <li><a href="/track"><i class="fas fa-search"></i> Track Status</a></li>
+          <li><a href="/teacher"><i class="fas fa-chalkboard-teacher"></i> Teacher Dashboard</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="container">
+      <div class="card" style="background:linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; text-align: center; margin-bottom:3rem;">
+        <div style="padding:3rem 2rem;">
+          <h1 style="font-size:3rem; font-weight:700; margin:0 0 1rem; color:white;">
+            <i class="fas fa-graduation-cap"></i> Assignment Management System
+          </h1>
+          <p style="font-size:1.25rem; margin:0; opacity:0.9;">
+            Streamline assignment submission, grading, and tracking for students and teachers
+          </p>
+        </div>
+      </div>
+
+      <!-- Feature Cards -->
+      <div class="form-row">
+        <!-- Student Card -->
+        <div class="card" style="text-align: center; padding:2rem;">
+          <div style="font-size:3rem; color:var(--primary); margin-bottom:1rem;">
+            <i class="fas fa-user-graduate"></i>
+          </div>
+          <h2 class="card-title">For Students</h2>
+          <p class="card-subtitle">
+            Submit your assignments easily and track their progress in real-time
+          </p>
+          <ul style="text-align:left; margin:1.5rem 0;">
+            <li><i class="fas fa-check" style="color:var(--success);"></i> Easy file upload with drag & drop</li>
+            <li><i class="fas fa-check" style="color:var(--success);"></i> Real-time submission tracking</li>
+            <li><i class="fas fa-check" style="color:var(--success);"></i> View grades and teacher feedback</li>
+            <li><i class="fas fa-check" style="color:var(--success);"></i> Instant tracking ID generation</li>
+          </ul>
+          <a href="/student" class="btn btn-primary btn-lg">
+            <i class="fas fa-upload"></i> Submit Assignment
+          </a>
+        </div>
+
+        <!-- Teacher Card -->
+        <div class="card" style="text-align: center; padding:2rem;">
+          <div style="font-size:3rem; color:var(--accent); margin-bottom:1rem;">
+            <i class="fas fa-chalkboard-teacher"></i>
+          </div>
+          <h2 class="card-title">For Teachers</h2>
+          <p class="card-subtitle">
+            Manage submissions efficiently with comprehensive grading tools
+          </p>
+          <ul style="text-align:left; margin:1.5rem 0;">
+            <li><i class="fas fa-check" style="color:var(--success);"></i> View all submissions in one place</li>
+            <li><i class="fas fa-check" style="color:var(--success);"></i> Quick grading with auto-save</li>
+            <li><i class="fas fa-check" style="color:var(--success);"></i> Add remarks and feedback</li>
+            <li><i class="fas fa-check" style="color:var(--success);"></i> Download submitted files</li>
+          </ul>
+          <a href="/teacher" class="btn btn-secondary btn-lg">
+            <i class="fas fa-chalkboard-teacher"></i> Teacher Dashboard
+          </a>
+        </div>
+      </div>
+
+
+
+      <!-- Footer -->
+      <div style="text-align:center; padding:2rem; color:var(--text-muted);">
+        <p>
+          <i class="fas fa-graduation-cap"></i> 
+          Assignment Management System - Simplifying Education Technology
+        </p>
+        <p>
+          <small>Built with Flask, Azure Cloud & Modern Web Technologies</small>
+        </p>
+      </div>
+    </div>
+
+    <style>
+      @media (max-width: 768px) {
+        .hero h1 {
+          font-size: 2rem !important;
+        }
+        
+        .form-row-3 {
+          grid-template-columns: 1fr !important;
+        }
+      }
+    </style>
+  </body>
+</html>

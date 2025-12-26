@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Teacher Login - Assignment Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <!-- Minimal Navigation for Login Page -->
+    <nav class="navbar" style="background:rgba(255, 255, 255, 0.95); backdrop-filter:blur(10px);">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">
+          <i class="fas fa-graduation-cap"></i> Assignment Manager
+        </a>
+        <ul class="nav-links">
+          <li><a href="/student"><i class="fas fa-upload"></i> Student Portal</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container">
+      <!-- Login Card -->
+      <div class="card" style="max-width:480px; margin:3rem auto; text-align:center;">
+        <div class="card-header">
+          <div style="font-size:3rem; color:var(--primary); margin-bottom:1rem;">
+            <i class="fas fa-user-shield"></i>
+          </div>
+          <h1 class="card-title">
+            <i class="fas fa-chalkboard-teacher"></i> Teacher Login
+          </h1>
+          <p class="card-subtitle">
+            Secure access for educators and administrators
+          </p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>{{ message }}</div>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="post" action="/login" id="loginForm" style="text-align:left;">
+          <div class="form-group">
+            <label class="form-label" for="teacher_id">
+              <i class="fas fa-id-card"></i> Teacher ID
+            </label>
+            <input 
+              type="text" 
+              id="teacher_id" 
+              name="teacher_id" 
+              class="form-input" 
+              required 
+              placeholder="Enter your teacher ID"
+              autocomplete="username"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">
+              <i class="fas fa-lock"></i> Password
+            </label>
+            <div style="position:relative;">
+              <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                class="form-input" 
+                required 
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                style="padding-right:3rem;"
+              >
+              <button 
+                type="button" 
+                id="togglePassword"
+                style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem;"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+              <input type="checkbox" name="remember_me" style="width:auto;">
+              <span class="text-muted">Remember me on this device</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg" style="width:100%; margin-top:1rem;" id="loginBtn">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Sign In</span>
+          </button>
+
+          <div class="text-center mt-4">
+            <p class="text-muted" style="margin:0;">
+              <i class="fas fa-info-circle"></i>
+              Teacher accounts are created by administrators
+            </p>
+          </div>
+        </form>
+
+        <!-- Back to Student Portal -->
+        <div class="mt-6 text-center">
+          <a href="/student" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Student Portal
+          </a>
+        </div>
+      </div>
+
+      <!-- Security Info Card -->
+      <div class="card" style="max-width:480px; margin:0 auto; background:linear-gradient(135deg, var(--border-light), var(--bg));">
+        <div style="text-align:center;">
+          <div style="font-size:2rem; color:var(--success); margin-bottom:1rem;">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3 style="margin:0 0 0.5rem; color:var(--text);">Secure Authentication</h3>
+          <p class="text-muted" style="margin:0;">
+            Your login is protected with enterprise-grade security
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Password toggle functionality
+      const passwordInput = document.getElementById('password');
+      const togglePassword = document.getElementById('togglePassword');
+      const toggleIcon = togglePassword.querySelector('i');
+
+      togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        if (type === 'password') {
+          toggleIcon.className = 'fas fa-eye';
+        } else {
+          toggleIcon.className = 'fas fa-eye-slash';
+        }
+      });
+
+      // Form submission with loading state
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const loginBtn = document.getElementById('loginBtn');
+        const originalHTML = loginBtn.innerHTML;
+        
+        // Show loading state
+        loginBtn.innerHTML = '<div class="loading"></div> <span>Signing in...</span>';
+        loginBtn.disabled = true;
+        
+        // Reset button after 3 seconds (in case of error)
+        setTimeout(() => {
+          loginBtn.innerHTML = originalHTML;
+          loginBtn.disabled = false;
+        }, 3000);
+      });
+
+      // Auto-focus first input
+      document.getElementById('teacher_id').focus();
+
+      // Form validation feedback
+      document.querySelectorAll('.form-input').forEach(input => {
+        input.addEventListener('invalid', function() {
+          this.style.borderColor = 'var(--danger)';
+        });
+        
+        input.addEventListener('input', function() {
+          this.style.borderColor = '';
+        });
+      });
+    </script>
+  </body>
+</html>

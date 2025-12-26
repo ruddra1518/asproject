@@ -3,63 +3,207 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Teacher Dashboard</title>
+    <title>Teacher Dashboard - Assignment Management</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   </head>
   <body>
-    <div class="wrap">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">
+          <i class="fas fa-graduation-cap"></i> Assignment Manager
+        </a>
+        <ul class="nav-links">
+          <li><a href="/student"><i class="fas fa-upload"></i> Submit Assignment</a></li>
+          <li><a href="/track"><i class="fas fa-search"></i> Track Status</a></li>
+          <li><a href="/teacher" class="active"><i class="fas fa-chalkboard-teacher"></i> Teacher Dashboard</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container">
       <div class="card">
-        <h1>Submissions</h1>
+        <div class="card-header">
+          <h1 class="card-title">
+            <i class="fas fa-chalkboard-teacher"></i> Teacher Dashboard
+          </h1>
+          <p class="card-subtitle">Review and grade student assignments</p>
+        </div>
+
         {% with messages = get_flashed_messages() %}
           {% if messages %}
-            <ul>
-            {% for m in messages %}
-              <li>{{ m }}</li>
+            {% for message in messages %}
+              <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <div>{{ message }}</div>
+              </div>
             {% endfor %}
-            </ul>
           {% endif %}
         {% endwith %}
 
-        <table>
-          <tr>
-            <th>Tracking ID</th>
-            <th>Name</th>
-            <th>ERP</th>
-            <th>Branch</th>
-            <th>Section</th>
-            <th>Subject</th>
-            <th>Submitted At</th>
-            <th>File</th>
-            <th>Marks</th>
-            <th>Remark</th>
-            <th>Action</th>
-          </tr>
-          {% for it in items %}
-          <tr>
-            <td>{{ it.id }}</td>
-            <td>{{ it.student_name }}</td>
-            <td>{{ it.erp }}</td>
-            <td>{{ it.branch }}</td>
-            <td>{{ it.section }}</td>
-            <td>{{ it.subject }}</td>
-            <td>{{ it.submitted_at }}</td>
-            <td><a href="{{ it.file_url }}" target="_blank">Download</a></td>
-            <td>{{ it.marks or "-" }}</td>
-            <td>{{ it.remark or "-" }}</td>
-            <td>
-              <form class="inline" action="/grade" method="post">
-                <input type="hidden" name="tracking_id" value="{{ it.id }}">
-                <input name="marks" placeholder="Marks">
-                <input name="remark" placeholder="Remark">
-                <button class="btn" type="submit">Save</button>
-              </form>
-            </td>
-          </tr>
-          {% endfor %}
-        </table>
+        {% if items %}
+          <!-- Summary Statistics -->
+          <div class="form-row mb-6">
+            {% set total_submissions = items|length %}
+            {% set graded_count = items|selectattr('marks')|list|length %}
+            {% set pending_count = total_submissions - graded_count %}
+            
+            <div class="card" style="padding:1.5rem; text-align:center;">
+              <div class="font-bold" style="font-size:2rem; color:var(--primary);">{{ total_submissions }}</div>
+              <div class="text-muted">Total Submissions</div>
+            </div>
+            <div class="card" style="padding:1.5rem; text-align:center;">
+              <div class="font-bold" style="font-size:2rem; color:var(--success);">{{ graded_count }}</div>
+              <div class="text-muted">Graded</div>
+            </div>
+            <div class="card" style="padding:1.5rem; text-align:center;">
+              <div class="font-bold" style="font-size:2rem; color:var(--warning);">{{ pending_count }}</div>
+              <div class="text-muted">Pending</div>
+            </div>
+          </div>
 
-        <p style="margin-top:14px"><a href="/student">Student upload</a> | <a href="/track">Track</a></p>
+          <!-- Submissions Table -->
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th><i class="fas fa-hashtag"></i> Tracking ID</th>
+                  <th><i class="fas fa-user"></i> Student</th>
+                  <th><i class="fas fa-id-card"></i> ERP</th>
+                  <th><i class="fas fa-building"></i> Branch</th>
+                  <th><i class="fas fa-users"></i> Section</th>
+                  <th><i class="fas fa-book"></i> Subject</th>
+                  <th><i class="fas fa-clock"></i> Submitted At</th>
+                  <th><i class="fas fa-file"></i> File</th>
+                  <th><i class="fas fa-chart-line"></i> Status</th>
+                  <th><i class="fas fa-star"></i> Marks</th>
+                  <th><i class="fas fa-comment"></i> Remark</th>
+                  <th><i class="fas fa-cog"></i> Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for it in items %}
+                <tr>
+                  <td><code>{{ it.id }}</code></td>
+                  <td>
+                    <strong>{{ it.student_name }}</strong>
+                  </td>
+                  <td>{{ it.erp }}</td>
+                  <td>{{ it.branch }}</td>
+                  <td>
+                    <span class="badge badge-info">{{ it.section }}</span>
+                  </td>
+                  <td><strong>{{ it.subject }}</strong></td>
+                  <td>
+                    <small class="text-muted">{{ it.submitted_at[:19].replace('T', ' ') }}</small>
+                  </td>
+                  <td>
+                    <a href="{{ it.file_url }}" target="_blank" class="btn btn-sm btn-secondary">
+                      <i class="fas fa-download"></i> Download
+                    </a>
+                  </td>
+                  <td>
+                    {% if it.marks %}
+                      <span class="badge badge-success">
+                        <i class="fas fa-check"></i> Graded
+                      </span>
+                    {% else %}
+                      <span class="badge badge-warning">
+                        <i class="fas fa-clock"></i> Pending
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <strong>{{ it.marks or "-" }}</strong>
+                  </td>
+                  <td>
+                    <div style="max-width:200px;">
+                      <small>{{ it.remark or "-" }}</small>
+                    </div>
+                  </td>
+                  <td>
+                    <form action="/grade" method="post" class="grade-form" data-submission-id="{{ it.id }}">
+                      <input type="hidden" name="tracking_id" value="{{ it.id }}">
+                      <div class="form-row">
+                        <input 
+                          type="number" 
+                          name="marks" 
+                          class="form-input" 
+                          placeholder="Marks"
+                          value="{{ it.marks or '' }}"
+                          min="0" 
+                          max="100"
+                          style="width:80px; margin-bottom:0.5rem;"
+                        >
+                        <button type="submit" class="btn btn-sm btn-primary">
+                          <i class="fas fa-save"></i>
+                        </button>
+                      </div>
+                      <input 
+                        type="text" 
+                        name="remark" 
+                        class="form-input" 
+                        placeholder="Remark"
+                        value="{{ it.remark or '' }}"
+                        style="width:100%; margin-top:0.5rem;"
+                      >
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>No submissions found. Submissions will appear here once students submit their assignments.</div>
+          </div>
+        {% endif %}
+
+        <div class="mt-6 text-center">
+          <a href="/student" class="btn btn-secondary">
+            <i class="fas fa-upload"></i> Student Upload
+          </a>
+          <a href="/track" class="btn btn-secondary">
+            <i class="fas fa-search"></i> Track Status
+          </a>
+        </div>
       </div>
     </div>
+
+    <script>
+      // Auto-save functionality for grades
+      document.querySelectorAll('.grade-form').forEach(form => {
+        const inputs = form.querySelectorAll('input[name="marks"], input[name="remark"]');
+        let timeout;
+        
+        inputs.forEach(input => {
+          input.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+              // Auto-submit after 2 seconds of inactivity
+              form.submit();
+            }, 2000);
+          });
+        });
+      });
+
+      // Form submission feedback
+      document.querySelectorAll('.grade-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+          const submitBtn = form.querySelector('button[type="submit"]');
+          const originalHTML = submitBtn.innerHTML;
+          submitBtn.innerHTML = '<div class="loading"></div>';
+          submitBtn.disabled = true;
+          
+          setTimeout(() => {
+            submitBtn.innerHTML = originalHTML;
+            submitBtn.disabled = false;
+          }, 1000);
+        });
+      });
+    </script>
   </body>
 </html>
