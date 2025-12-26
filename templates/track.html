@@ -1,30 +1,49 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <title>Track Assignment</title>
-  <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Track Submission</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <h1>Track Submission</h1>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul>
+            {% for m in messages %}
+              <li>{{ m }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
 
-<nav class="navbar">
-  <div class="nav-brand">📘 Assignment System</div>
-  <div class="nav-links">
-    <a href="/student">Student</a>
-    <a href="/teacher">Teacher</a>
-    <a href="/track">Track</a>
-  </div>
-</nav>
+        <form method="post">
+          <label>Tracking ID:
+            <input name="tracking_id" required>
+          </label>
+          <div style="margin-top:10px">
+            <button class="btn" type="submit">Lookup</button>
+          </div>
+        </form>
 
-<div class="container">
-  <h1>📊 Assignment Status</h1>
-  <p class="lead">Track your submission progress</p>
+        {% if result %}
+          <h2 style="margin-top:18px">Result</h2>
+          <ul>
+            <li><strong>Tracking ID:</strong> {{ result.id }}</li>
+            <li><strong>Student:</strong> {{ result.student_name }} ({{ result.erp }})</li>
+            <li><strong>Subject:</strong> {{ result.subject }}</li>
+            <li><strong>Submitted At:</strong> {{ result.submitted_at }}</li>
+            <li><strong>File:</strong> <a href="{{ result.file_url }}" target="_blank">Download</a></li>
+            <li><strong>Marks:</strong> {{ result.marks or "-" }}</li>
+            <li><strong>Remark:</strong> {{ result.remark or "-" }}</li>
+          </ul>
+        {% endif %}
 
-  <div class="card">
-    <p><strong>Status:</strong> <span class="badge success">Reviewed</span></p>
-    <p><strong>Marks:</strong> 85</p>
-    <p><strong>Feedback:</strong> Good work, well structured.</p>
-  </div>
-</div>
-
-</body>
+        <p style="margin-top:14px"><a href="/student">Student upload</a> | <a href="/teacher">Teacher dashboard</a></p>
+      </div>
+    </div>
+  </body>
 </html>

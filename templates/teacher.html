@@ -1,41 +1,65 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <title>Teacher Panel</title>
-  <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Teacher Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <h1>Submissions</h1>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul>
+            {% for m in messages %}
+              <li>{{ m }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
 
-<nav class="navbar">
-  <div class="nav-brand">📘 Assignment System</div>
-  <div class="nav-links">
-    <a href="/student">Student</a>
-    <a href="/teacher">Teacher</a>
-    <a href="/track">Track</a>
-  </div>
-</nav>
+        <table>
+          <tr>
+            <th>Tracking ID</th>
+            <th>Name</th>
+            <th>ERP</th>
+            <th>Branch</th>
+            <th>Section</th>
+            <th>Subject</th>
+            <th>Submitted At</th>
+            <th>File</th>
+            <th>Marks</th>
+            <th>Remark</th>
+            <th>Action</th>
+          </tr>
+          {% for it in items %}
+          <tr>
+            <td>{{ it.id }}</td>
+            <td>{{ it.student_name }}</td>
+            <td>{{ it.erp }}</td>
+            <td>{{ it.branch }}</td>
+            <td>{{ it.section }}</td>
+            <td>{{ it.subject }}</td>
+            <td>{{ it.submitted_at }}</td>
+            <td><a href="{{ it.file_url }}" target="_blank">Download</a></td>
+            <td>{{ it.marks or "-" }}</td>
+            <td>{{ it.remark or "-" }}</td>
+            <td>
+              <form class="inline" action="/grade" method="post">
+                <input type="hidden" name="tracking_id" value="{{ it.id }}">
+                <input name="marks" placeholder="Marks">
+                <input name="remark" placeholder="Remark">
+                <button class="btn" type="submit">Save</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
 
-<div class="container">
-  <h1>🧑‍🏫 Teacher Panel</h1>
-  <p class="lead">Review, grade and give feedback</p>
-
-  <div class="card split">
-    <div>
-      <h3>📄 Assignment Review</h3>
-      <p class="lead">Check submitted files and assign marks.</p>
+        <p style="margin-top:14px"><a href="/student">Student upload</a> | <a href="/track">Track</a></p>
+      </div>
     </div>
-
-    <form method="post">
-      <label>Marks</label>
-      <input type="number" name="marks" required>
-
-      <label>Feedback</label>
-      <input type="text" name="feedback" required>
-
-      <button type="submit">Submit Evaluation</button>
-    </form>
-  </div>
-</div>
-
-</body>
+  </body>
 </html>
