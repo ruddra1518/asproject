@@ -28,7 +28,7 @@ app.secret_key = os.getenv("FLASK_SECRET", "change-me")
 
 # Azure Blob settings
 AZURE_STORAGE_CONN = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-AZURE_STORAGE_CONTAINER = os.getenv("AZURE_STORAGE_CONTAINER", "assignment-files")
+AZURE_STORAGE_CONTAINER = os.getenv("AZURE_STORAGE_CONTAINER", "assignments")
 
 # Cosmos container (uses COSMOS_ENDPOINT/COSMOS_KEY via database.py)
 cosmos_container = get_container_from_env()
